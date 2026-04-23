@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  role      String   @default("CLIENT") // DESIGNER|CLIENT
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  designerProfile DesignerProfile?
+  hireRequests    HireRequest[]    @relation("ClientRequests")
+  receivedRequests HireRequest[]    @relation("DesignerRequests")
+  reviewsGiven    Review[]         @relation("ReviewAuthor")
+  reviewsReceived Review[]         @relation("ReviewTarget")
+  messages        Message[]
+  contracts       Contract[]       @relation("ContractClient")
+  designerContracts Contract[]     @relation("ContractDesigner")
+}
+
+model DesignerProfile {
+  id                  String       @id @default(cuid())
+  userId              String       @unique
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName         String
+  bio                 String?
+  avatar              String?
+  coverImage          String?
+  tagline             String?
+  customDomain        String?      @unique
+  slug                String       @unique
+  theme               String?      // Stores theme colors, fonts, etc. (JSON string)
+  headerConfig        String?      // Header customization (logo, links, layout)
+  footerConfig        String?      // Footer customization (socials, copyright, links)
+  isPublished         Boolean      @default(false)
+  availability        String       @default("AVAILABLE") // AVAILABLE|BUSY|UNAVAILABLE
+  responseTimeHours   Int          @default(24)
+  completedProjects   Int          @default(0)
+  rating              Float        @default(0)
+  
+  pageBlocks          PageBlock[]
+  projects            Project[]
+  servicePackages     ServicePackage[]
+}
+
+model PageBlock {
+  id          String          @id @default(cuid())
+  profileId   String
+  profile     DesignerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type        String          // hero|gallery|casestudy|about|skills|testimonials|pricing|contact|stats|embed
+  order       Int
+  content     String          // JSON string
+  isVisible   Boolean         @default(true)
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  profileId   String
+  profile     DesignerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  tags        String          // Comma separated tags
+  coverImage  String?
+  mediaItems  String          // JSON string list of images/videos
+  category    String?
+  year        String?
+  tools       String          // Comma separated tools
+  isFeature   Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model ServicePackage {
+  id            String          @id @default(cuid())
+  profileId     String
+  profile       DesignerProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  price         Float
+  currency      String          @default("USD")
+  deliverables  String          // Comma separated
+  deliveryDays  Int
+  revisions     Int
+  hireRequests  HireRequest[]
+}
+
+model HireRequest {
+  id          String          @id @default(cuid())
+  clientId    String
+  client      User            @relation("ClientRequests", fields: [clientId], references: [id])
+  designerId  String
+  designer    User            @relation("DesignerRequests", fields: [designerId], references: [id])
+  packageId   String?
+  package     ServicePackage? @relation(fields: [packageId], references: [id])
+  message     String?
+  status      String          @default("PENDING") // PENDING|ACCEPTED|REJECTED|COMPLETED
+  budget      Float?
+  deadline    DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  contract    Contract?
+}
+
+model Contract {
+  id                String          @id @default(cuid())
+  hireRequestId     String          @unique
+  hireRequest       HireRequest     @relation(fields: [hireRequestId], references: [id])
+  clientId          String
+  client            User            @relation("ContractClient", fields: [clientId], references: [id])
+  designerId        String
+  designer          User            @relation("ContractDesigner", fields: [designerId], references: [id])
+  terms             String?
+  milestones        String?         // JSON string list of milestone steps
+  totalAmount       Float
+  status            String          @default("PENDING_SIGNATURE") // DRAFT|PENDING_SIGNATURE|ACTIVE|PAID|COMPLETED|DISPUTED
+  signedByDesigner  Boolean         @default(false)
+  signedByClient    Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  review            Review?
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  sender         User     @relation(fields: [senderId], references: [id])
+  content        String
+  attachments    String?  // JSON string
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  contractId  String   @unique
+  contract    Contract @relation(fields: [contractId], references: [id])
+  authorId    String
+  author      User     @relation("ReviewAuthor", fields: [authorId], references: [id])
+  targetId    String
+  target      User     @relation("ReviewTarget", fields: [targetId], references: [id])
+  rating      Int
+  body        String?
+  tags        String?  // Comma separated
+  createdAt   DateTime @default(now())
+}
