@@ -18,7 +18,7 @@ export const projectRouter = router({
           theme: JSON.stringify(input.theme),
           headerConfig: JSON.stringify(input.header),
           footerConfig: JSON.stringify(input.footer),
-          blocks: {
+          pageBlocks: {
             deleteMany: {},
             create: (input.blocks as any[]).map((b, i) => ({
               id: b.id,
@@ -61,9 +61,14 @@ export const projectRouter = router({
 
       return db.project.create({
         data: {
-          ...input,
+          title: input.title,
+          description: input.description,
+          coverImage: input.coverImage,
+          category: input.category,
+          tags: input.tags.join(","),
           profileId: designer.id,
-          mediaItems: [],
+          mediaItems: JSON.stringify([]),
+          tools: "",
         },
       })
     }),

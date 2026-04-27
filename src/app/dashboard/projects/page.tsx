@@ -70,8 +70,8 @@ export default function ProjectsPage() {
                   rows={5}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={createProject.isLoading}>
-                {createProject.isLoading ? "Creating..." : "Create Project"}
+              <Button type="submit" className="w-full" disabled={createProject.isPending}>
+                {createProject.isPending ? "Creating..." : "Create Project"}
               </Button>
             </form>
           </DialogContent>

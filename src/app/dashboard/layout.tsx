@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const userData = syncMutation.data
   const isEditor = pathname?.startsWith("/dashboard/editor")
 
-  if (syncMutation.isLoading) {
+  if (syncMutation.isPending) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

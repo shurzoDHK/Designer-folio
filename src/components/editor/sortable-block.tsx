@@ -291,7 +291,7 @@ function SliderBlockPreview({ block }: { block: PageBlock }) {
 
       {showDots && items.length > 1 && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {items.map((_, i) => (
+          {items.map((_: any, i: number) => (
             <button
               key={i}
               onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIndex(i) }}
@@ -642,7 +642,7 @@ function renderBlockPreview(block: PageBlock) {
         repeat: isLoop ? Infinity : 0,
         repeatDelay: interval,
         duration: anim === "typewriter" ? 2 : (anim === "reveal" ? 1 : (anim === "scroll" ? (content.scrollSpeed || 10) : (anim === "blink" ? (content.blinkSpeed || 1) : 4))),
-        ease: anim === "scroll" ? "linear" : "easeInOut",
+        ease: (anim === "scroll" ? "linear" : "easeInOut") as any,
       }
 
       const animKey = `${anim}-${isLoop}-${interval}-${content.scrollSpeed}-${content.blinkSpeed}-${text}`
@@ -790,7 +790,7 @@ function renderBlockPreview(block: PageBlock) {
       const socialLinks: { platform: string; url: string }[] = content.socialLinks || []
       const showForm = content.showForm !== false
 
-      type CI = { Icon: React.ComponentType<{ className?: string }>; value: string }
+      type CI = { Icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; value: string }
       const contactItems: CI[] = [
         content.email && { Icon: Mail, value: content.email },
         content.phone && { Icon: Phone, value: content.phone },

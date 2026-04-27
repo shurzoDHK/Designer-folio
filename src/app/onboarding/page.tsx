@@ -102,9 +102,9 @@ export default function OnboardingPage() {
           <Button 
             className="w-full text-lg h-12" 
             onClick={handleSubmit}
-            disabled={onboard.isLoading || !displayName}
+            disabled={onboard.isPending || !displayName}
           >
-            {onboard.isLoading ? "Setting up..." : "Complete Setup"}
+            {onboard.isPending ? "Setting up..." : "Complete Setup"}
           </Button>
         </CardFooter>
       </Card>

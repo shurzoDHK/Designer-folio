@@ -20,7 +20,7 @@ import {
 import { BlockLibrary } from "@/components/editor/block-library"
 import { Canvas } from "@/components/editor/canvas"
 import { BlockSettings } from "@/components/editor/block-settings"
-import { PageBlock, HeaderConfig, FooterConfig, ThemeConfig } from "@/lib/types/editor"
+import { PageBlock, BlockType, HeaderConfig, FooterConfig, ThemeConfig } from "@/lib/types/editor"
 import { Button } from "@/components/ui/button"
 import { Eye, EyeOff, Monitor, Smartphone, Save, Globe, Loader2, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -77,6 +77,7 @@ export default function EditorPage() {
       if (p.pageBlocks && p.pageBlocks.length > 0) {
         setBlocks(p.pageBlocks.map(b => ({
           ...b,
+          type: b.type as BlockType,
           content: typeof b.content === "string" ? JSON.parse(b.content) : b.content
         })))
       }
